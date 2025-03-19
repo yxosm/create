@@ -7,6 +7,12 @@ import { createClient } from '../../../utils/supabase/client'
 // Configure this page to be dynamically rendered
 export const dynamic = 'force-dynamic'
 
+// This function ensures Next.js knows this page should be dynamically rendered
+// and not included in static export
+export function generateStaticParams() {
+  return []
+}
+
 export default function AuthCallback() {
   const router = useRouter()
   
