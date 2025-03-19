@@ -21,6 +21,7 @@ jobs:
       # Set environment variables at the job level to ensure they're available for all steps
       NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
       NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+      NEXT_PUBLIC_SITE_URL: https://${{ github.repository_owner }}.github.io/create
     steps:
       - name: Checkout
         uses: actions/checkout@v4
