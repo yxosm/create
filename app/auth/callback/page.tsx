@@ -4,6 +4,9 @@ import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '../../../utils/supabase/client'
 
+// Configure this page to be dynamically rendered
+export const dynamic = 'force-dynamic'
+
 export default function AuthCallback() {
   const router = useRouter()
   
