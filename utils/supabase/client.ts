@@ -1,16 +1,19 @@
 import { createBrowserClient } from "@supabase/ssr";
 
-// Function to determine the current site URL
+// Function to determine the correct site URL for GitHub Pages
 const getSiteUrl = () => {
   if (typeof window === 'undefined') {
+    // During build time or server-side rendering
     return process.env.NEXT_PUBLIC_SITE_URL || 'https://yxosm.github.io/create';
   }
   
-  // In the browser, use the current location
-  const protocol = window.location.protocol;
-  const host = window.location.host;
-  const basePath = process.env.NODE_ENV === 'production' ? '/create' : '';
-  return `${protocol}//${host}${basePath}`;
+  // In the browser, for GitHub Pages deployment
+  if (window.location.hostname.includes('github.io')) {
+    return `https://yxosm.github.io/create`;
+  }
+  
+  // For local development
+  return `${window.location.protocol}//${window.location.host}`;
 };
 
 export const createClient = () =>
@@ -23,7 +26,7 @@ export const createClient = () =>
         autoRefreshToken: true,
         detectSessionInUrl: true,
         persistSession: true,
-        // Use the actual site URL instead of localhost
+        // Always use the correct site URL for GitHub Pages
         redirectTo: `${getSiteUrl()}/auth/callback`,
       },
     }
