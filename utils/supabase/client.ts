@@ -27,7 +27,7 @@ export const createClient = () =>
         detectSessionInUrl: true,
         persistSession: true,
         // Always use the correct site URL for GitHub Pages
-        redirectTo: `${getSiteUrl()}/auth/callback`,
+        redirectTo: `${getSiteUrl()}/create/auth/callback`,
       },
     }
   );
