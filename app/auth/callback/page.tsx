@@ -22,7 +22,7 @@ export default function AuthCallback() {
           
           // For GitHub Pages, ensure we redirect to the correct path with the /create prefix
           const isGitHubPages = window.location.hostname.includes('github.io')
-          const dashboardPath = isGitHubPages ? '/create/dashboard' : '/dashboard'
+          const dashboardPath = isGitHubPages ? '/create' : '/create'
           
           router.push(dashboardPath)
         } catch (error) {
