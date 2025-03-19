@@ -7,7 +7,7 @@ type Breakpoints = {
   isDesktop: boolean
 }
 
-export function useMobile(): Breakpoints {
+export function useIsMobile(): Breakpoints {
   const [windowSize, setWindowSize] = useState<{
     width: number | undefined
     height: number | undefined
