@@ -1,26 +1,30 @@
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
-import { cookies } from 'next/headers'
-import { NextResponse } from 'next/server'
-import { createClient } from '@/utils/supabase/server'
+'use client'
 
-export const dynamic = 'force-dynamic'
+import { useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import { createClient } from '@supabase/supabase-js'
 
-export async function GET(request: Request) {
-  try {
-    const requestUrl = new URL(request.url)
-    const code = requestUrl.searchParams.get('code')
+export default function AuthCallback() {
+  const router = useRouter()
+  
+  useEffect(() => {
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL || '',
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
+    )
+
+    // Get code from URL
+    const code = new URL(window.location.href).searchParams.get('code')
     
-    if (code) {
-      const cookieStore = cookies()
-      const supabase = await createClient(cookieStore)
-      await supabase.auth.exchangeCodeForSession(code)
+    async function handleCallback() {
+      if (code) {
+        await supabase.auth.exchangeCodeForSession(code)
+        router.push('/dashboard') // Or your post-login redirect page
+      }
     }
 
-    // Get the redirectTo parameter or default to home page
-    const redirectTo = requestUrl.searchParams.get('redirectTo') || '/'
-    return NextResponse.redirect(new URL(redirectTo, requestUrl.origin))
-  } catch (error) {
-    console.error('Auth callback error:', error)
-    return NextResponse.redirect(new URL('/', request.url))
-  }
+    handleCallback()
+  }, [router])
+
+  return <div className="flex justify-center p-8">Processing login...</div>
 }
