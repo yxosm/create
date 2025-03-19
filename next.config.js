@@ -16,13 +16,8 @@ const nextConfig = {
   // Environment variables for client side - using GitHub repository secrets
   env: {
     NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
-    NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-  },
-  // App Router compatibility settings
-  distDir: 'out',
-  // Replace exportPathMap with a configuration compatible with the App Router
-  experimental: {
-    appDir: true,
+    NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL || 'https://yxosm.github.io/create'
   },
   // Configure static generation
   generateBuildId: async () => {
