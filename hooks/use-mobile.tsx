@@ -58,4 +58,4 @@ export function useIsMobile(): Breakpoints {
   return breakpoints
 }
 
-export default useMobile
+export default useIsMobile
