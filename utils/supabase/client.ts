@@ -25,9 +25,17 @@ export const createClient = () =>
         flowType: 'pkce',
         autoRefreshToken: true,
         detectSessionInUrl: true,
-        persistSession: true,
-        // Always use the correct site URL for GitHub Pages
-        redirectTo: `${getSiteUrl()}/create/auth/callback`,
+        persistSession: true
       },
+      cookies: {
+        name: 'sb-auth',
+        lifetime: 60 * 60 * 8,
+        domain: window?.location?.hostname ?? '',
+        path: '/',
+        sameSite: 'lax'
+      },
+      global: {
+        fetch: fetch.bind(globalThis)
+      }
     }
   );
