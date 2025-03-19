@@ -41,6 +41,15 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 
 // Service categories for classification
 const SERVICE_TYPES = [
+  "Oil Change",
+  "Brake Service",
+  "Tire Service", 
+  "Engine Repair",
+  "Transmission Service",
+  "A/C & Heating",
+  "Battery/Electrical",
+  "Suspension/Steering",
+  "General Maintenance",
   "Other"
 ]
 
@@ -67,6 +76,7 @@ export default function AdminPage() {
   const { user } = useAuth()
   const router = useRouter()
   const { toast } = useToast()
+  const [supabase] = useState(() => createClient())
 
   useEffect(() => {
     const checkAdminAndLoadData = async () => {
@@ -92,11 +102,20 @@ export default function AdminPage() {
         return
       }
 
+      if (!supabase) {
+        console.log('No Supabase client available')
+        toast({
+          title: "Error",
+          description: "Unable to connect to database",
+          variant: "destructive",
+        })
+        router.push('/')
+        return
+      }
+
       console.log('Admin authenticated:', user.email)
       
       try {
-        const supabase = createClient()
-        
         // First verify we have a valid session
         const { data: sessionData } = await supabase.auth.getSession()
         if (!sessionData.session) {
@@ -119,8 +138,6 @@ export default function AdminPage() {
           return
         }
 
-        console.log(`Successfully fetched ${data?.length || 0} appointments`)
-
         if (!data || data.length === 0) {
           toast({
             title: "No Appointments",
@@ -129,10 +146,10 @@ export default function AdminPage() {
         }
 
         // Pre-process appointments to extract service types from messages
-        const processedAppointments = data?.map(apt => {
-          const serviceType = detectServiceType(apt.message || apt.car_model)
-          return { ...apt, service_type: serviceType }
-        }) || []
+        const processedAppointments = data?.map(apt => ({
+          ...apt,
+          service_type: detectServiceType(apt.message || apt.car_model)
+        })) || []
 
         setAppointments(processedAppointments)
       } catch (error: any) {
@@ -148,7 +165,7 @@ export default function AdminPage() {
     }
 
     checkAdminAndLoadData()
-  }, [user, router, toast])
+  }, [user, router, toast, supabase])
 
   const detectServiceType = (text: string): string => {
     text = text.toLowerCase()
@@ -219,6 +236,15 @@ export default function AdminPage() {
       })
       return
     }
+
+    if (!supabase) {
+      toast({
+        title: "Error",
+        description: "Unable to connect to database",
+        variant: "destructive",
+      })
+      return
+    }
     
     setIsProcessing(true)
 
@@ -227,9 +253,6 @@ export default function AdminPage() {
       setAppointments(appointments.map(apt => 
         apt.id === id ? { ...apt, status: newStatus } : apt
       ))
-      
-      // Create a fresh Supabase client to ensure we have valid tokens
-      const supabase = createClient()
       
       // Get the current session to ensure we're authenticated
       const { data: sessionData } = await supabase.auth.getSession()
