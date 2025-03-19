@@ -7,20 +7,20 @@ try {
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
-  typescript: {
-    ignoreBuildErrors: true,
-  },
+  reactStrictMode: true,
   images: {
     unoptimized: true,
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'hebbkx1anhila5yf.public.blob.vercel-storage.com',
+      },
+    ],
   },
-  experimental: {
-    webpackBuildWorker: true,
-    parallelServerBuildTraces: true,
-    parallelServerCompiles: true,
-  },
+  output: 'export',
+  basePath: process.env.NODE_ENV === 'production' ? '/create' : '',
+  assetPrefix: process.env.NODE_ENV === 'production' ? '/create/' : '',
+  trailingSlash: true,
 }
 
 mergeConfig(nextConfig, userConfig)
