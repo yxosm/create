@@ -20,25 +20,14 @@ export default function AuthCallback() {
           const supabase = createClient()
           await supabase.auth.exchangeCodeForSession(code)
           
-          // For GitHub Pages, ensure we redirect to the correct path with the /create prefix
-          const isGitHubPages = window.location.hostname.includes('github.io')
-          const dashboardPath = isGitHubPages ? '/create' : '/create'
-          
-          router.push(dashboardPath)
+          // Use window.location.replace for hard redirect to handle GitHub Pages base path
+          window.location.replace('/create')
         } catch (error) {
           console.error('Error exchanging code for session:', error)
-          // Redirect to home with the correct path prefix
-          const isGitHubPages = window.location.hostname.includes('github.io')
-          const homePath = isGitHubPages ? '/create' : '/'
-          
-          router.push(homePath)
+          window.location.replace('/create')
         }
       } else {
-        // No code in URL, redirect to home with correct path
-        const isGitHubPages = window.location.hostname.includes('github.io')
-        const homePath = isGitHubPages ? '/create' : '/'
-        
-        router.push(homePath)
+        window.location.replace('/create')
       }
     }
 
