@@ -16,9 +16,9 @@ export async function middleware(request: NextRequest) {
     
     // If this is an auth callback redirect with a missing base path,
     // redirect to the correct URL with the base path included
-    if (url.pathname === '/create/auth/callback' && basePath && !url.pathname.startsWith(basePath)) {
+    if (url.pathname === '/auth/callback' && basePath) {
       // Redirect to the correct callback URL with the base path
-      const correctUrl = new URL(`${url.origin}${basePath}/create/auth/callback${url.search}`)
+      const correctUrl = new URL(`${url.origin}${basePath}/auth/callback${url.search}`)
       return NextResponse.redirect(correctUrl)
     }
 
