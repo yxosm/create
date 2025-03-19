@@ -2,25 +2,22 @@
 
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { createClient } from '../../../utils/supabase/client'
+import { createClient } from '@/utils/supabase/client'
+import type { SupabaseClient } from '@supabase/supabase-js'
 
-// Configure this page to be dynamically rendered
+// Add export config to ensure this page is always dynamically rendered
 export const dynamic = 'force-dynamic'
 
 export default function AuthCallback() {
   const router = useRouter()
   
   useEffect(() => {
-    // Get code from URL
-    const code = new URL(window.location.href).searchParams.get('code')
-    
-    async function handleCallback() {
+    const handleCallback = async (supabase: SupabaseClient) => {
+      const code = new URL(window.location.href).searchParams.get('code')
+      
       if (code) {
         try {
-          const supabase = createClient()
           await supabase.auth.exchangeCodeForSession(code)
-          
-          // Use window.location.replace for hard redirect to handle GitHub Pages base path
           window.location.replace('/create')
         } catch (error) {
           console.error('Error exchanging code for session:', error)
@@ -31,7 +28,13 @@ export default function AuthCallback() {
       }
     }
 
-    handleCallback()
+    const supabase = createClient()
+    if (!supabase) {
+      window.location.replace('/create')
+      return
+    }
+
+    handleCallback(supabase)
   }, [router])
 
   return <div className="flex justify-center p-8">Processing login...</div>
