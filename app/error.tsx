@@ -2,8 +2,7 @@
 
 import { useEffect } from 'react'
 import { Button } from '@/components/ui/button'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { AlertTriangle } from 'lucide-react'
+import { AlertOctagon } from 'lucide-react'
 
 export default function Error({
   error,
@@ -17,23 +16,28 @@ export default function Error({
     console.error(error)
   }, [error])
 
+  const handleReset = () => {
+    // If on GitHub Pages, ensure proper redirect
+    const basePath = window.location.pathname.startsWith('/create') ? '/create' : ''
+    if (window.location.pathname !== basePath) {
+      window.location.href = basePath || '/'
+      return
+    }
+    reset()
+  }
+
   return (
-    <div className="container py-10 flex flex-col items-center">
-      <Alert variant="destructive" className="mb-6 max-w-md w-full">
-        <AlertTriangle className="h-4 w-4" />
-        <AlertTitle>Error</AlertTitle>
-        <AlertDescription>
-          An unexpected error occurred while loading this page.
-        </AlertDescription>
-      </Alert>
-      
-      <div className="text-center max-w-md">
-        <h2 className="text-xl font-medium mb-2">Something went wrong!</h2>
-        <p className="mb-6 text-muted-foreground">
-          Please try refreshing the page or click the button below to try again.
-        </p>
-        <Button onClick={reset}>Try again</Button>
+    <div className="flex min-h-screen flex-col items-center justify-center p-6 text-center">
+      <div className="mb-8 w-16 h-16 bg-red-100 rounded-full flex items-center justify-center">
+        <AlertOctagon className="text-red-600" />
       </div>
+      <h1 className="text-2xl font-bold mb-4">Something went wrong!</h1>
+      <p className="mb-8 text-gray-500">
+        We apologize for the inconvenience. An unexpected error has occurred.
+      </p>
+      <Button onClick={handleReset}>
+        Try again
+      </Button>
     </div>
   )
 }
