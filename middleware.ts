@@ -4,22 +4,26 @@ import { createClient } from '@/utils/supabase/middleware'
 
 export async function middleware(request: NextRequest) {
   try {
-    // Get the correct request URL that accounts for the base path in production
-    const url = new URL(request.url)
+    // Check if we're in production and need the /create prefix
     const basePath = process.env.NODE_ENV === 'production' ? '/create' : ''
     
-    // Create client with the correct base path awareness
+    // Get the pathname without the basePath
+    const pathname = request.nextUrl.pathname.replace(basePath, '')
+    
+    // Create client
     const { supabase, response } = createClient(request)
     
     // Check auth state
     await supabase.auth.getSession()
     
-    // If this is an auth callback redirect with a missing base path,
-    // redirect to the correct URL with the base path included
-    if (url.pathname === '/auth/callback' && basePath) {
-      // Redirect to the correct callback URL with the base path
-      const correctUrl = new URL(`${url.origin}${basePath}/auth/callback${url.search}`)
-      return NextResponse.redirect(correctUrl)
+    // Special handling for auth callback
+    if (pathname === '/auth/callback') {
+      // Make sure we keep any query parameters
+      const redirectUrl = new URL(
+        `${basePath}/auth/callback${request.nextUrl.search}`,
+        request.url
+      )
+      return NextResponse.redirect(redirectUrl)
     }
 
     return response
@@ -37,7 +41,8 @@ export const config = {
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
      * - public folder
+     * - .well-known folder (for security validation files)
      */
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$|\\.well-known).*)',
   ],
 }
