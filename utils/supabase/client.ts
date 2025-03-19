@@ -4,12 +4,12 @@ import { createBrowserClient } from "@supabase/ssr";
 const getSiteUrl = () => {
   if (typeof window === 'undefined') {
     // During build time or server-side rendering
-    return process.env.NEXT_PUBLIC_SITE_URL || 'https://yxosm.github.io/create';
+    return 'https://yxosm.github.io/create';
   }
   
   // In the browser, for GitHub Pages deployment
   if (window.location.hostname.includes('github.io')) {
-    return `https://yxosm.github.io/create`;
+    return 'https://yxosm.github.io/create';
   }
   
   // For local development
