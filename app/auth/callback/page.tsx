@@ -2,24 +2,28 @@
 
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { createClient } from '@supabase/supabase-js'
+import { createClient } from '../../../utils/supabase/client'
 
 export default function AuthCallback() {
   const router = useRouter()
   
   useEffect(() => {
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL || '',
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
-    )
-
     // Get code from URL
     const code = new URL(window.location.href).searchParams.get('code')
     
     async function handleCallback() {
       if (code) {
-        await supabase.auth.exchangeCodeForSession(code)
-        router.push('/dashboard') // Or your post-login redirect page
+        try {
+          const supabase = createClient()
+          await supabase.auth.exchangeCodeForSession(code)
+          router.push('/dashboard') // Or your post-login redirect page
+        } catch (error) {
+          console.error('Error exchanging code for session:', error)
+          router.push('/') // Redirect to home on error
+        }
+      } else {
+        // No code in URL, redirect to home
+        router.push('/')
       }
     }
 
