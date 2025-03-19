@@ -18,13 +18,15 @@ const nextConfig = {
     NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
     NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
   },
-  // Exclude auth callback route from static export
+  // App Router compatibility settings
   distDir: 'out',
-  exportPathMap: async function (defaultPathMap) {
-    // Remove auth callback from static export
-    delete defaultPathMap['/auth/callback'];
-    
-    return defaultPathMap;
+  // Replace exportPathMap with a configuration compatible with the App Router
+  experimental: {
+    appDir: true,
+  },
+  // Configure static generation
+  generateBuildId: async () => {
+    return 'build'
   }
 }
 
