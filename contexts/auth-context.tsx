@@ -19,9 +19,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [session, setSession] = useState<Session | null>(null)
   const [loading, setLoading] = useState(true)
-  const supabase = createClient()
+  const [supabase] = useState(() => createClient())
 
   useEffect(() => {
+    if (!supabase) return
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       setUser(session?.user ?? null)
       setSession(session)
@@ -29,11 +31,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     })
 
     return () => {
-      subscription.unsubscribe()
+      subscription?.unsubscribe()
     }
-  }, [])
+  }, [supabase])
 
   const signInWithEmail = async (email: string, password: string) => {
+    if (!supabase) throw new Error('Supabase client not initialized')
     const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
@@ -42,6 +45,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   const signInWithGoogle = async () => {
+    if (!supabase) throw new Error('Supabase client not initialized')
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
@@ -52,6 +56,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   const signUp = async (email: string, password: string) => {
+    if (!supabase) throw new Error('Supabase client not initialized')
     const { error } = await supabase.auth.signUp({
       email,
       password,
@@ -63,6 +68,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   const signOut = async () => {
+    if (!supabase) throw new Error('Supabase client not initialized')
     const { error } = await supabase.auth.signOut()
     if (error) throw error
   }
