@@ -16,8 +16,13 @@ const getSiteUrl = () => {
   return `${window.location.protocol}//${window.location.host}`;
 };
 
-export const createClient = () =>
-  createBrowserClient(
+export const createClient = () => {
+  // Return undefined during SSR to prevent window access
+  if (typeof window === 'undefined') {
+    return undefined;
+  }
+
+  return createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
@@ -30,7 +35,7 @@ export const createClient = () =>
       cookies: {
         name: 'sb-auth',
         lifetime: 60 * 60 * 8,
-        domain: window?.location?.hostname ?? '',
+        domain: window.location.hostname,
         path: '/',
         sameSite: 'lax'
       },
@@ -39,3 +44,4 @@ export const createClient = () =>
       }
     }
   );
+}
