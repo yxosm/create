@@ -72,6 +72,19 @@ const formatPhone = (phone: string): string => {
   return phone
 }
 
+// Helper function to handle GitHub Pages base path
+const getBasePath = () => {
+  if (typeof window === 'undefined') {
+    return '/create'
+  }
+  return window.location.hostname.includes('github.io') ? '/create' : ''
+}
+
+// Helper function to convert date to Eastern Time
+const toEasternTime = (date: Date) => {
+  return new Date(date.toLocaleString("en-US", { timeZone: "America/New_York" }))
+}
+
 export function AppointmentModal({ children }: { children: React.ReactNode }) {
   const [date, setDate] = useState<Date | undefined>(undefined)
   const [name, setName] = useState("")
@@ -83,18 +96,20 @@ export function AppointmentModal({ children }: { children: React.ReactNode }) {
   const [dailyCount, setDailyCount] = useState(0)
   const { user } = useAuth()
   const { toast } = useToast()
+  const [supabase] = useState(() => createClient())
 
   // Check daily limit whenever user changes
   useEffect(() => {
-    if (user) {
+    if (user && supabase) {
       checkDailyLimit(user.id).then(count => {
         setDailyCount(count)
       })
     }
-  }, [user])
+  }, [user, supabase])
 
   const checkDailyLimit = async (userId: string) => {
-    const supabase = createClient()
+    if (!supabase) return 0
+
     const { count } = await supabase
       .from('appointments')
       .select('*', { count: 'exact', head: true })
@@ -106,6 +121,15 @@ export function AppointmentModal({ children }: { children: React.ReactNode }) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (!supabase) {
+      toast({
+        title: "Error",
+        description: "Unable to connect to the service.",
+        variant: "destructive",
+      })
+      return
+    }
+
     // Validate inputs
     const sanitizedName = sanitizeInput(name)
     const sanitizedPhone = sanitizeInput(formatPhone(phone)) // Format the phone number
@@ -183,14 +207,12 @@ export function AppointmentModal({ children }: { children: React.ReactNode }) {
         return
       }
 
-      const supabase = createClient()
-
       const appointment: Omit<Appointment, 'id' | 'created_at'> = {
         name: sanitizedName,
         email: user.email!,
         phone: sanitizedPhone,
         car_model: sanitizedCarModel,
-        preferred_date: date.toISOString(),
+        preferred_date: date!.toISOString(),
         message: sanitizedMessage,
         status: 'pending',
         user_id: user.id,
@@ -202,9 +224,7 @@ export function AppointmentModal({ children }: { children: React.ReactNode }) {
         .select()
         .single()
 
-      if (error) {
-        throw error
-      }
+      if (error) throw error
 
       // Update the daily count
       setDailyCount(prevCount => prevCount + 1)
