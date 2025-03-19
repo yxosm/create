@@ -24,40 +24,38 @@ export const createClient = (request: NextRequest) => {
         flowType: 'pkce',
         autoRefreshToken: true,
         detectSessionInUrl: true,
-        persistSession: true,
-        // Use the actual site URL with the correct base path
-        redirectTo: `${siteUrl}create/auth/callback`,
+        persistSession: true
       },
       cookies: {
         get(name: string) {
-          return request.cookies.get(name)?.value
+          return request.cookies.get(name)?.value;
         },
         set(name: string, value: string, options: CookieOptions) {
           request.cookies.set({
             name,
             value,
             ...options,
-          })
+          });
           supabaseResponse.cookies.set({
             name,
             value,
             ...options,
-          })
+          });
         },
         remove(name: string, options: CookieOptions) {
           request.cookies.set({
             name,
             value: '',
             ...options,
-          })
+          });
           supabaseResponse.cookies.set({
             name,
             value: '',
             ...options,
-          })
-        },
+          });
+        }
       },
-    },
+    }
   );
 
   return { supabase, response: supabaseResponse };
