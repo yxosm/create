@@ -1,26 +1,14 @@
-import { createBrowserClient } from "@supabase/ssr";
+import { createBrowserClient } from "@supabase/ssr"
 
-// Function to determine the correct site URL for GitHub Pages
-const getSiteUrl = () => {
-  if (typeof window === 'undefined') {
-    // During build time or server-side rendering
-    return 'https://yxosm.github.io/create';
-  }
-  
-  // In the browser, for GitHub Pages deployment
-  if (window.location.hostname.includes('github.io')) {
-    return 'https://yxosm.github.io/create';
-  }
-  
-  // For local development
-  return `${window.location.protocol}//${window.location.host}`;
-};
+const getBasePath = () => process.env.NODE_ENV === 'production' ? '/create' : ''
 
 export const createClient = () => {
   // Return undefined during SSR to prevent window access
   if (typeof window === 'undefined') {
-    return undefined;
+    return undefined
   }
+
+  const basePath = window.location.pathname.startsWith('/create') ? '/create' : ''
 
   return createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -30,18 +18,18 @@ export const createClient = () => {
         flowType: 'pkce',
         autoRefreshToken: true,
         detectSessionInUrl: true,
-        persistSession: true
+        persistSession: true,
       },
       cookies: {
         name: 'sb-auth',
         lifetime: 60 * 60 * 8,
         domain: window.location.hostname,
-        path: '/',
+        path: basePath || '/',
         sameSite: 'lax'
       },
       global: {
         fetch: fetch.bind(globalThis)
       }
     }
-  );
+  )
 }
