@@ -1,8 +1,2 @@
-// This is a route segment config file that ensures the auth callback is dynamically rendered
-export const dynamic = 'force-dynamic'
-export const runtime = 'edge'
-
-// This route will be rendered at request time, not build time
-export async function generateStaticParams() {
-  return []
-}
+// This file is causing build errors and is not needed
+// The page.tsx file already has the dynamic setting
